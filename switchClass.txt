@@ -1,0 +1,55 @@
+import React from "react";
+import camera from "./camera";
+
+let hidden = null;
+let visibilityChange = null;
+if (typeof document.hidden !== "undefined") {
+  hidden = "hidden";
+  visibilityChange = "visibilitychange";
+} else if (typeof document.msHidden !== "undefined") {
+  hidden = "msHidden";
+  visibilityChange = "msvisibilitychange";
+} else if (typeof document.webkitHidden !== "undefined") {
+  hidden = "webkitHidden";
+  visibilityChange = "webkitvisibilitychange";
+}
+
+class Switch extends React.Component {
+  state = {
+    actions: [],
+  };
+
+  componentDidMount() {
+    document.addEventListener(
+      visibilityChange,
+      this.handleVisibilityChange,
+      false
+    );
+  }
+
+  handleVisibilityChange = () => {
+    if (document[hidden]) {
+      alert("Cannot switch tabs");
+      camera.takeSnapshot();
+      this.setState({ actions: [...this.state.actions, "hide"] });
+    } else {
+      this.setState({ actions: [...this.state.actions, "show"] });
+    }
+  };
+
+  componentWillUnmount() {
+    document.removeEventListener(visibilityChange, this.handleVisibilityChange);
+  }
+
+  render() {
+    return (
+      <ul>
+        {this.state.actions.map((item, key) => (
+          <li key={key}>{item}</li>
+        ))}
+      </ul>
+    );
+  }
+}
+
+export default Switch;
